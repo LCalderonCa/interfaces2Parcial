@@ -1,0 +1,4 @@
+[
+  { "id": 1, "name": "Admin Sistema", "email": "admin@reservaplus.com", "password": "admin123", "role": "admin" },
+  { "id": 2, "name": "Carlos Torres", "email": "carlos@mail.com", "password": "cliente123", "role": "cliente" }
+]

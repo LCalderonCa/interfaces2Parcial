@@ -1,0 +1,35 @@
+[
+  {
+    "id": 1,
+    "clienteNombre": "María López",
+    "clienteEmail": "maria@mail.com",
+    "mesaId": 2,
+    "fecha": "2025-08-15",
+    "hora": "19:00",
+    "personas": 3,
+    "estado": "confirmada",
+    "notas": "Cumpleaños"
+  },
+  {
+    "id": 2,
+    "clienteNombre": "Juan Pérez",
+    "clienteEmail": "juan@mail.com",
+    "mesaId": 4,
+    "fecha": "2025-08-15",
+    "hora": "20:30",
+    "personas": 5,
+    "estado": "pendiente",
+    "notas": ""
+  },
+  {
+    "id": 3,
+    "clienteNombre": "Ana García",
+    "clienteEmail": "ana@mail.com",
+    "mesaId": 1,
+    "fecha": "2025-08-16",
+    "hora": "13:00",
+    "personas": 2,
+    "estado": "confirmada",
+    "notas": "Aniversario"
+  }
+]

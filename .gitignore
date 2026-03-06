@@ -1,0 +1,8 @@
+node_modules/
+dist/
+tmp/
+out-tsc/
+coverage/
+.vscode/
+.idea/
+*.log
