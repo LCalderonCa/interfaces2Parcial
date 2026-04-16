@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { db } from "../data/db";
+import api from "../services/api";
 
 const AuthContext = createContext(null);
 
@@ -7,34 +7,39 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser]       = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Al iniciar, restaurar sesión desde localStorage
   useEffect(() => {
     const stored = localStorage.getItem("rp_session");
     if (stored) setUser(JSON.parse(stored));
     setLoading(false);
   }, []);
 
-  const login = (email, password) => {
-    const usuarios = db.usuarios.getAll();
-    const found = usuarios.find(u => u.email === email && u.password === password);
-    if (!found) return { success: false, message: "Credenciales incorrectas" };
-    const { password: _, ...safeUser } = found;
-    setUser(safeUser);
-    localStorage.setItem("rp_session", JSON.stringify(safeUser));
-    return { success: true, user: safeUser };
+  // ── Login: llama a la API de Laravel ──────────────────────
+  const login = async (email, password) => {
+    try {
+      const data = await api.clientes.login(email, password);
+      // data = { success: true, user: { id, name, email, role } }
+      setUser(data.user);
+      localStorage.setItem("rp_session", JSON.stringify(data.user));
+      return { success: true, user: data.user };
+    } catch (err) {
+      return { success: false, message: err.message || "Credenciales incorrectas" };
+    }
   };
 
-  const register = (name, email, password) => {
-    const usuarios = db.usuarios.getAll();
-    if (usuarios.find(u => u.email === email))
-      return { success: false, message: "El email ya está registrado" };
-    const newUser = { id: Date.now(), name, email, password, role: "cliente" };
-    db.usuarios.save([...usuarios, newUser]);
-    const { password: _, ...safeUser } = newUser;
-    setUser(safeUser);
-    localStorage.setItem("rp_session", JSON.stringify(safeUser));
-    return { success: true, user: safeUser };
+  // ── Register: crea cliente en Laravel ─────────────────────
+  const register = async (name, email, password) => {
+    try {
+      const newUser = await api.clientes.registrar(name, email, password);
+      setUser(newUser);
+      localStorage.setItem("rp_session", JSON.stringify(newUser));
+      return { success: true, user: newUser };
+    } catch (err) {
+      return { success: false, message: err.message || "Error al registrar" };
+    }
   };
 
+  // ── Logout ─────────────────────────────────────────────────
   const logout = () => {
     setUser(null);
     localStorage.removeItem("rp_session");

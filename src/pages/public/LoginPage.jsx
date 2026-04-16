@@ -3,28 +3,30 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [error, setError]       = useState("");
+  const [loading, setLoading]   = useState(false);
   const { login } = useAuth();
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-    setTimeout(() => {
-      const result = login(email, password);
-      setLoading(false);
-      if (result.success) {
-        if (result.user.role === "admin") navigate("/admin");
-        else navigate("/reservar");
-      } else {
-        setError(result.message);
-      }
-    }, 800);
+
+    // login ahora es async → necesita await
+    const result = await login(email, password);
+
+    setLoading(false);
+
+    if (result.success) {
+      if (result.user.role === "admin") navigate("/admin");
+      else navigate("/reservar");
+    } else {
+      setError(result.message);
+    }
   };
 
   return (

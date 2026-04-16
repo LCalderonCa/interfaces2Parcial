@@ -758,3 +758,289 @@ input, select, textarea { font-family: inherit; }
   .evento-tab      { flex: 1; min-width: 140px; }
   .calendar-layout { grid-template-columns: 1fr; }
 }
+
+
+.loading-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.loading-text {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-top: 4px;
+}
+
+.error-state {
+  background: var(--white);
+  padding: 40px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  max-width: 400px;
+}
+
+.error-icon {
+  font-size: 2.5rem;
+}
+
+.error-state h3 {
+  font-size: 1.3rem;
+  color: var(--gray-800);
+  margin-bottom: 4px;
+}
+
+.error-state p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+/* =====================================================
+   MICROINTERACCIONES Y TRANSICIONES — ReservaPlus
+   ===================================================== */
+
+/* ── 1. Entrada de modales ───────────────────────────────────
+   Antes: aparecían de golpe.
+   Ahora: fade + scale desde el centro.
+   --------------------------------------------------------- */
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.92) translateY(-12px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);     }
+}
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-overlay {
+  animation: overlayIn 0.2s ease forwards;
+}
+.modal {
+  animation: modalIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ── 2. Transición de badges de estado ───────────────────────
+   Al cambiar pendiente → confirmada → cancelada el color
+   hace una pequeña pulsación.
+   --------------------------------------------------------- */
+.estado-badge {
+  transition: background 0.3s ease, color 0.3s ease, transform 0.15s ease;
+  display: inline-block;
+}
+.estado-badge:hover {
+  transform: scale(1.06);
+}
+
+/* ── 3. Filas de tabla con hover suave ───────────────────────
+   --------------------------------------------------------- */
+.admin-table tbody tr {
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+}
+.admin-table tbody tr:hover {
+  background: var(--primary-pale);
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+
+/* ── 4. Botones de acción con micro-rebote ───────────────────
+   --------------------------------------------------------- */
+.btn-action, .btn-action-sm {
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background 0.2s ease,
+              box-shadow 0.2s ease;
+}
+.btn-action:active, .btn-action-sm:active {
+  transform: scale(0.88) !important;
+}
+
+/* ── 5. Steps del formulario de reserva ─────────────────────
+   Cada step entra con un slide desde la derecha.
+   --------------------------------------------------------- */
+@keyframes stepIn {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+.step-content {
+  animation: stepIn 0.3s ease forwards;
+}
+
+/* ── 6. Cards de mesa seleccionable ─────────────────────────
+   Pulso al seleccionar una mesa.
+   --------------------------------------------------------- */
+@keyframes selectPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(224,123,57,0.5); }
+  70%  { box-shadow: 0 0 0 8px rgba(224,123,57,0); }
+  100% { box-shadow: 0 0 0 0 rgba(224,123,57,0); }
+}
+.mesa-option.selected {
+  animation: selectPulse 0.5s ease forwards;
+}
+.mesa-option {
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.mesa-option:hover {
+  transform: translateY(-3px);
+}
+
+/* ── 7. Pantalla de éxito de reserva ────────────────────────
+   El ícono 🎉 rebota al aparecer.
+   --------------------------------------------------------- */
+@keyframes successBounce {
+  0%   { transform: scale(0);   opacity: 0; }
+  60%  { transform: scale(1.2); opacity: 1; }
+  80%  { transform: scale(0.9); }
+  100% { transform: scale(1);   }
+}
+.reserva-success .success-icon {
+  animation: successBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  display: inline-block;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reserva-success h2 {
+  animation: fadeInUp 0.4s ease 0.2s both;
+}
+.reserva-success .reserva-summary {
+  animation: fadeInUp 0.4s ease 0.35s both;
+}
+.reserva-success .success-actions {
+  animation: fadeInUp 0.4s ease 0.5s both;
+}
+
+/* ── 8. Cards de reserva en "Mis Reservas" ──────────────────
+   Entrada escalonada al cargar la lista.
+   --------------------------------------------------------- */
+@keyframes cardSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reservas-list .reserva-card {
+  animation: cardSlideIn 0.35s ease both;
+}
+.reservas-list .reserva-card:nth-child(1) { animation-delay: 0.05s; }
+.reservas-list .reserva-card:nth-child(2) { animation-delay: 0.10s; }
+.reservas-list .reserva-card:nth-child(3) { animation-delay: 0.15s; }
+.reservas-list .reserva-card:nth-child(4) { animation-delay: 0.20s; }
+.reservas-list .reserva-card:nth-child(5) { animation-delay: 0.25s; }
+
+/* ── 9. Stat cards del dashboard ────────────────────────────
+   Entrada escalonada al cargar el panel.
+   --------------------------------------------------------- */
+.stats-grid .stat-card {
+  animation: cardSlideIn 0.3s ease both;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.stats-grid .stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+.stats-grid .stat-card:nth-child(1) { animation-delay: 0.05s; }
+.stats-grid .stat-card:nth-child(2) { animation-delay: 0.10s; }
+.stats-grid .stat-card:nth-child(3) { animation-delay: 0.15s; }
+.stats-grid .stat-card:nth-child(4) { animation-delay: 0.20s; }
+.stats-grid .stat-card:nth-child(5) { animation-delay: 0.25s; }
+.stats-grid .stat-card:nth-child(6) { animation-delay: 0.30s; }
+
+/* ── 10. Inputs con transición de foco mejorada ─────────────
+   Borde animado al hacer focus.
+   --------------------------------------------------------- */
+.form-group input,
+.form-group select,
+.form-group textarea {
+  transition: border-color 0.2s ease,
+              box-shadow 0.2s ease,
+              transform 0.15s ease;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  transform: translateY(-1px);
+}
+
+/* ── 11. Alerta de error / éxito ────────────────────────────
+   --------------------------------------------------------- */
+@keyframes shakeIn {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-6px); }
+  40%  { transform: translateX(6px); }
+  60%  { transform: translateX(-4px); }
+  80%  { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+.auth-error,
+.form-alert.error {
+  animation: shakeIn 0.4s ease;
+}
+
+/* ── 12. Sidebar admin ───────────────────────────────────────
+   Links con deslizamiento al hover.
+   --------------------------------------------------------- */
+.sidebar-link {
+  position: relative;
+  overflow: hidden;
+}
+.sidebar-link::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--primary);
+  transform: scaleY(0);
+  transition: transform 0.2s ease;
+  transform-origin: center;
+}
+.sidebar-link:hover::before,
+.sidebar-link.active::before {
+  transform: scaleY(1);
+}
+
+/* ── 13. Loading screen mejorado ────────────────────────────
+   --------------------------------------------------------- */
+.loading-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+.loading-text {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  animation: fadeInUp 0.4s ease 0.3s both;
+}
+.error-state {
+  background: var(--white);
+  padding: 40px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  max-width: 400px;
+  animation: modalIn 0.3s ease forwards;
+}
+.error-icon { font-size: 2.5rem; }
+.error-state h3 { font-size: 1.3rem; color: var(--gray-800); margin-bottom: 4px; }
+.error-state p  { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px; }
+
+/* ── 14. Mesas admin cards ───────────────────────────────────
+   --------------------------------------------------------- */
+.mesa-admin-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.mesa-admin-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ── Preferencia de movimiento reducido ─────────────────────
+   Respeta la configuración de accesibilidad del sistema.
+   --------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

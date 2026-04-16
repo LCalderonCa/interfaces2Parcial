@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const Navbar = () => {
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+// React.memo evita que Navbar se re-renderice cuando cambian
+// datos que no le afectan (ej: lista de reservas actualizada)
+const Navbar = memo(() => {
+  const [scrolled,  setScrolled]  = useState(false);
+  const [menuOpen,  setMenuOpen]  = useState(false);
   const { user, logout } = useAuth();
   const location = useLocation();
 
@@ -13,6 +15,16 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Cerrar menú al cambiar de ruta
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location]);
+
+  // useCallback: la función logout no se recrea en cada render
+  const handleLogout = useCallback(() => {
+    logout();
+  }, [logout]);
 
   const navLinks = [
     { label: "Inicio",   href: "#inicio" },
@@ -49,7 +61,7 @@ const Navbar = () => {
                 <Link to="/admin" className="btn-admin">Panel Admin</Link>
               )}
               <Link to="/mis-reservas" className="btn-nav-outline">Mis Reservas</Link>
-              <button onClick={logout} className="btn-nav-ghost">Salir</button>
+              <button onClick={handleLogout} className="btn-nav-ghost">Salir</button>
             </div>
           ) : (
             <div className="nav-auth">
@@ -61,6 +73,8 @@ const Navbar = () => {
       </div>
     </nav>
   );
-};
+});
+
+Navbar.displayName = "Navbar";
 
 export default Navbar;

@@ -3,9 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const RegisterPage = () => {
-  const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
+  const [form, setForm]     = useState({ name: "", email: "", password: "", confirm: "" });
   const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
+  const [loading, setLoading]   = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -18,15 +19,24 @@ const RegisterPage = () => {
     return e;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setApiError("");
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+
     setLoading(true);
-    setTimeout(() => {
-      register(form.name, form.email, form.password);
+
+    // register ahora es async → necesita await
+    const result = await register(form.name, form.email, form.password);
+
+    setLoading(false);
+
+    if (result.success) {
       navigate("/reservar");
-    }, 800);
+    } else {
+      setApiError(result.message);
+    }
   };
 
   const handleChange = (field) => (e) => {
@@ -44,6 +54,8 @@ const RegisterPage = () => {
             <h2>Crear Cuenta</h2>
             <p>Regístrate para reservar mesas fácilmente</p>
           </div>
+
+          {apiError && <div className="auth-error">⚠️ {apiError}</div>}
 
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
