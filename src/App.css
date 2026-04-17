@@ -1521,3 +1521,33 @@ input, select, textarea { font-family: inherit; }
 @media (max-width: 900px) {
   .rpt-fila-2 { grid-template-columns: 1fr; }
 }
+
+
+/* Tag "Hoy" y "Finalizada" */
+.reserva-tag {
+  padding: 0.15rem 0.55rem;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reserva-tag.hoy {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+}
+
+.reserva-tag.pasada {
+  background: var(--gray-100);
+  color: var(--gray-600);
+  border: 1px solid var(--gray-200);
+}
+
+/* Mensaje cuando no se puede cancelar */
+.no-cancelable-msg {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
