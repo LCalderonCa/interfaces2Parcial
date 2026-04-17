@@ -6,18 +6,38 @@ const ZONAS = ["Interior", "Terraza", "Barra", "Salón VIP", "Jardín"];
 
 const MesasAdmin = () => {
   const { mesas, actualizarMesa, agregarMesa, eliminarMesa } = useReservas();
-  const [showForm, setShowForm] = useState(false);
-  const [editingMesa, setEditingMesa] = useState(null);
-  const [form, setForm] = useState({ numero: "", capacidad: 2, zona: "Interior" });
+  const [showForm, setShowForm]         = useState(false);
+  const [editingMesa, setEditingMesa]   = useState(null);
+  const [form, setForm]                 = useState({ numero: "", capacidad: 2, zona: "Interior" });
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [formError, setFormError]       = useState("");   // ← nuevo
+  const [loadingForm, setLoadingForm]   = useState(false); // ← nuevo
 
-  const handleSubmit = () => {
-    if (!form.numero) return;
-    if (editingMesa) {
-      actualizarMesa(editingMesa.id, { numero: parseInt(form.numero), capacidad: parseInt(form.capacidad), zona: form.zona });
-    } else {
-      agregarMesa({ numero: parseInt(form.numero), capacidad: parseInt(form.capacidad), zona: form.zona });
+  // ── Guardar (crear o editar) ──────────────────────────────────
+  const handleSubmit = async () => {
+    if (!form.numero) { setFormError("El número de mesa es obligatorio"); return; }
+    setFormError("");
+    setLoadingForm(true);
+
+    const datos = {
+      numero:    parseInt(form.numero),
+      capacidad: parseInt(form.capacidad),
+      zona:      form.zona,
+    };
+
+    const result = editingMesa
+      ? await actualizarMesa(editingMesa.id, datos)
+      : await agregarMesa(datos);
+
+    setLoadingForm(false);
+
+    if (!result.success) {
+      // Mostrar el mensaje de error dentro del modal sin cerrarlo
+      setFormError(result.message);
+      return;
     }
+
+    // Solo cerrar si tuvo éxito
     setShowForm(false);
     setEditingMesa(null);
     setForm({ numero: "", capacidad: 2, zona: "Interior" });
@@ -26,6 +46,7 @@ const MesasAdmin = () => {
   const handleEdit = (mesa) => {
     setEditingMesa(mesa);
     setForm({ numero: mesa.numero, capacidad: mesa.capacidad, zona: mesa.zona });
+    setFormError("");
     setShowForm(true);
   };
 
@@ -33,10 +54,17 @@ const MesasAdmin = () => {
     actualizarMesa(id, { estado });
   };
 
+  const handleCerrarModal = () => {
+    setShowForm(false);
+    setEditingMesa(null);
+    setFormError("");
+    setForm({ numero: "", capacidad: 2, zona: "Interior" });
+  };
+
   const estadoColor = (estado) => {
-    if (estado === "disponible") return "badge-success";
-    if (estado === "ocupada") return "badge-danger";
-    if (estado === "reservada") return "badge-warning";
+    if (estado === "disponible")   return "badge-success";
+    if (estado === "ocupada")      return "badge-danger";
+    if (estado === "reservada")    return "badge-warning";
     if (estado === "mantenimiento") return "badge-default";
     return "";
   };
@@ -49,19 +77,35 @@ const MesasAdmin = () => {
           <nav className="breadcrumb">
             <span>Dashboard</span> / <span className="active">Mesas</span>
           </nav>
-          <button onClick={() => { setShowForm(true); setEditingMesa(null); setForm({ numero: "", capacidad: 2, zona: "Interior" }); }} className="btn-primary">
+          <button
+            onClick={() => { setShowForm(true); setEditingMesa(null); setFormError(""); setForm({ numero: "", capacidad: 2, zona: "Interior" }); }}
+            className="btn-primary"
+          >
             + Agregar Mesa
           </button>
         </div>
 
-        {/* Form modal */}
+        {/* Modal crear/editar */}
         {showForm && (
           <div className="modal-overlay">
             <div className="modal">
               <h3>{editingMesa ? "✏️ Editar Mesa" : "➕ Nueva Mesa"}</h3>
+
+              {/* Mensaje de error del servidor */}
+              {formError && (
+                <div className="form-alert error" style={{ marginBottom: "1rem" }}>
+                  ⚠️ {formError}
+                </div>
+              )}
+
               <div className="form-group">
                 <label>Número de Mesa</label>
-                <input type="number" value={form.numero} onChange={(e) => setForm({ ...form, numero: e.target.value })} placeholder="Ej: 10" />
+                <input
+                  type="number"
+                  value={form.numero}
+                  onChange={(e) => { setForm({ ...form, numero: e.target.value }); setFormError(""); }}
+                  placeholder="Ej: 10"
+                />
               </div>
               <div className="form-group">
                 <label>Capacidad (personas)</label>
@@ -76,14 +120,19 @@ const MesasAdmin = () => {
                 </select>
               </div>
               <div className="modal-actions">
-                <button onClick={handleSubmit} className="btn-primary">{editingMesa ? "Guardar" : "Crear Mesa"}</button>
-                <button onClick={() => { setShowForm(false); setEditingMesa(null); }} className="btn-outline">Cancelar</button>
+                <button onClick={handleSubmit} className="btn-primary" disabled={loadingForm}>
+                  {loadingForm
+                    ? <span className="spinner-sm"></span>
+                    : editingMesa ? "Guardar" : "Crear Mesa"
+                  }
+                </button>
+                <button onClick={handleCerrarModal} className="btn-outline">Cancelar</button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Confirm delete modal */}
+        {/* Modal eliminar */}
         {confirmDelete && (
           <div className="modal-overlay">
             <div className="modal">
@@ -97,7 +146,7 @@ const MesasAdmin = () => {
           </div>
         )}
 
-        {/* Vista en cards */}
+        {/* Cards */}
         <div className="mesas-admin-grid">
           {mesas.map((mesa) => (
             <div key={mesa.id} className={`mesa-admin-card ${mesa.estado}`}>
@@ -127,7 +176,7 @@ const MesasAdmin = () => {
           ))}
         </div>
 
-        {/* Also show table view */}
+        {/* Tabla */}
         <div className="table-wrapper mt-4">
           <h3>Vista de Tabla</h3>
           <table className="admin-table">

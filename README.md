@@ -11,9 +11,8 @@ Sistema fullstack de reservas de mesas para restaurante, compuesto por un fronte
 
 | Nombre | Código |
 |--------|--------|
-| ⚠ COMPLETAR Nombre 1 | ⚠ Código |
-| ⚠ COMPLETAR Nombre 2 | ⚠ Código |
-| ⚠ COMPLETAR Nombre 3 | ⚠ Código |
+| Lucio Calderón Cáceres | IV40568587 |
+
 
 ---
 
@@ -188,7 +187,7 @@ El proyecto Laravel se encuentra en `laravel-backend/` (proyecto enviado por el 
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
-DB_PORT=3306
+DB_PORT=3307
 DB_DATABASE=reservaplus
 DB_USERNAME=root
 DB_PASSWORD=
@@ -308,11 +307,7 @@ Tests: 12 passed, 12 total
 | `useReducer` | `ReservasContext.jsx` | Estado predecible con acciones tipadas |
 | CSS animations | `App.css` | 14 microinteracciones sin librerías externas |
 
----
 
-## Prototipo Figma
-
-⚠ COMPLETAR: [Ver prototipo interactivo en Figma](https://figma.com/...)
 
 ---
 

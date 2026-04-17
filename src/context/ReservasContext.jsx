@@ -111,10 +111,9 @@ export const ReservasProvider = ({ children }) => {
       const nueva = await api.mesas.crear(datos);
       const formateada = mesaDesdeAPI(nueva);
       dispatch({ type: "ADD_MESA", payload: formateada });
-      return formateada;
+      return { success: true, mesa: formateada };
     } catch (err) {
-      console.error("Error al agregar mesa:", err.message);
-      return null;
+      return { success: false, message: err.message || "Error al agregar mesa" };
     }
   }, []);
 
@@ -122,8 +121,9 @@ export const ReservasProvider = ({ children }) => {
     try {
       const actualizada = await api.mesas.actualizar(id, datos);
       dispatch({ type: "UPDATE_MESA", payload: mesaDesdeAPI(actualizada) });
+      return { success: true };
     } catch (err) {
-      console.error("Error al actualizar mesa:", err.message);
+      return { success: false, message: err.message || "Error al actualizar mesa" };
     }
   }, []);
 
@@ -144,6 +144,21 @@ export const ReservasProvider = ({ children }) => {
       return !reservas.find(
         r => r.mesaId === mesa.id && r.fecha === fecha && r.hora === hora && r.estado !== "cancelada"
       );
+    }),
+  [mesas, reservas]);
+
+  // Devuelve TODAS las mesas con campo `disponible` para el mapa
+  const getMesasConEstado = useCallback((fecha, hora, personas) =>
+    mesas.map(mesa => {
+      const ocupada = !!reservas.find(
+        r => r.mesaId === mesa.id && r.fecha === fecha && r.hora === hora && r.estado !== "cancelada"
+      );
+      const sinCapacidad = mesa.capacidad < personas;
+      return {
+        ...mesa,
+        disponible: !ocupada && !sinCapacidad,
+        motivo: ocupada ? "ocupada" : sinCapacidad ? "sin capacidad" : null,
+      };
     }),
   [mesas, reservas]);
 
@@ -169,7 +184,7 @@ export const ReservasProvider = ({ children }) => {
       mesas, reservas, cargando, error, stats,
       crearReserva, actualizarEstadoReserva, eliminarReserva,
       agregarMesa,  actualizarMesa,          eliminarMesa,
-      getMesasDisponibles, getReservasByFecha,
+      getMesasDisponibles, getMesasConEstado, getReservasByFecha,
     }}>
       {children}
     </ReservasContext.Provider>

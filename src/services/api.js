@@ -23,7 +23,26 @@ async function request(method, endpoint, body = null) {
   const data = await response.json();
 
   if (!response.ok) {
-    // Lanza el mensaje de error que viene de Laravel
+    // Para errores 422 de validación, extraer el primer mensaje de errors{}
+    // y traducirlo si es un mensaje genérico de Laravel en inglés
+    if (response.status === 422 && data.errors) {
+      const primerCampo = Object.keys(data.errors)[0];
+      const mensajeIngles = data.errors[primerCampo][0];
+      const traducciones = {
+        'has already been taken': 'ya está registrado',
+        'is required':            'es obligatorio',
+        'must be at least':       'debe tener al menos',
+        'must be a number':       'debe ser un número',
+      };
+      let mensaje = mensajeIngles;
+      for (const [en, es] of Object.entries(traducciones)) {
+        if (mensajeIngles.includes(en)) {
+          mensaje = `El campo "${primerCampo}" ${es}`;
+          break;
+        }
+      }
+      throw new Error(mensaje);
+    }
     throw new Error(data.message || `Error ${response.status}`);
   }
   return data;
